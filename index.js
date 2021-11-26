@@ -27,12 +27,20 @@ MongoClient.connect(url, { useNewUrlParser: true })
         });
 
         app.post('/create', (req, res) => {
-            userCollection.insertOne(req.body)
+            userCollection.find({"name": req.body.name}).toArray()
+            .then(result => {
+                if (result == undefined) {
+                    userCollection.insertOne(req.body)
                 .then(result => {
                     console.log("User created")
                     res.redirect('/')
                 })
                 .catch(error => console.error(error))
+                }
+                else {
+                    console.log("User already exist")
+                }
+            })
         });
 
         app.post('/login', (req, res) => {

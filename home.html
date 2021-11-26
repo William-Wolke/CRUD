@@ -4,36 +4,53 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <title>CRUD App</title>
 </head>
 <body>
+  <div class="d-flex flex-column justify-content-center align-items-center text-center">
     <h1>Node and Express.</h1>
-    <form action="/create" method="POST">
+    <hr style="width: 60vw;">
+    <form action="/create" method="POST" class="m-3">
         <h2>Create User</h2>
+        <br>
         <input type="text" placeholder="username" name="name">
+        <br>
         <input type="password" placeholder="password" name="pass">
+        <br>
         <input type="submit">
       </form>
 
       <form action="/login" method="POST">
         <h2>Login</h2>
+        <br>
         <input type="text" placeholder="username" name="name">
+        <br>
         <input type="password" placeholder="password" name="pass">
+        <br>
         <input type="submit">
       </form>
 
       <form action="/update" method="POST">
         <h2>Update password</h2>
+        <br>
         <input type="text" placeholder="username" name="name">
+        <br>
         <input type="password" placeholder="old password" name="oldPass">
+        <br>
         <input type="password" placeholder="new password" name="newPass">
+        <br>
         <input type="submit">
       </form>
       <form action="/delete" method="POST">
         <h2>Delete user</h2>
+        <br>
         <input type="text" placeholder="username" name="name">
+        <br>
         <input type="password" placeholder="password" name="pass">
+        <br>
         <input type="submit">
       </form>
+    </div>
 </body>
 </html>
