@@ -1,12 +1,12 @@
+//Import modules
 const express = require('express');
 const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://127.0.0.1:27017'
 const app = express();
-
 const dbName = 'User';
 
-//Mongo db
+//Connect to Mongo db
 MongoClient.connect(url, { useNewUrlParser: true })
     .then(client => {
         // Storing a reference to the database so you can use it later
@@ -17,105 +17,121 @@ MongoClient.connect(url, { useNewUrlParser: true })
 
         //Body parser
         app.use(bodyParser.urlencoded({ extended: true }));
+
         //Handlers
+
+        //Listen
         app.listen(3000, () => {
             console.log('listening on 3000');
         });
-
+        //Get file on site enter
         app.get('/', (req, res) => {
             res.sendFile(__dirname + '/home.html');
         });
-
+        //Create user
         app.post('/create', (req, res) => {
-            userCollection.find({"name": req.body.name}).toArray()
+            let name = req.body.name;
+            userCollection.find({"name": name}).toArray()
             .then(result => {
-                if (result == undefined) {
+                //Result == false if array is empty
+                if (result == false) {
                     userCollection.insertOne(req.body)
-                .then(result => {
-                    console.log("User created")
-                    res.redirect('/')
-                })
-                .catch(error => console.error(error))
+                        .then(result => {
+                            console.log("User created");
+                            //Send respons to browser
+                            res.redirect('/');
+                        })
+                        .catch(error => console.error(error))
                 }
+                //Array is not empty
                 else {
-                    console.log("User already exist")
+                    console.log("User already exist");
                 }
             })
+            .catch(error => console.error(error));
         });
-
+        //Login user
         app.post('/login', (req, res) => {
             let name = req.body.name;
             let pass = req.body.pass;
-            let users = db.collection('Users').find({ "name": name }).toArray()
 
+            userCollection.find({ "name": name }).toArray()
+                //Promise
                 .then(result => {
-                    console.log(result[0].pass)
-                    //console.log(result.pass, pass)
-                    if (result[0].pass == pass) {
-                        console.log("Logged in")
+                    //Check if pass is correct
+                    if (result[0].pass === pass) {
+                        console.log("Inloggad");
+                        //Send respons to browser
                         res.redirect('/')
                     }
+                    //Pass is incorrect
                     else {
-                        console.log("Incorrect password or username")
-                        res.redirect('/')
+                        console.log("Fel användarnamn eller lösenord");
+                        //Send respons to browser
+                        res.redirect('/');
                     }
                 })
-                .catch(error => console.error(error))
+                .catch(error => console.error(error));
         });
-
+        //Update user password
         app.post('/update', (req, res) => {
             let name = req.body.name;
             let oldPass = req.body.oldPass;
             let newPass = req.body.newPass;
-            let users = db.collection('Users').find({ "name": name }).toArray()
-
+            //Get this user from the db
+            userCollection.find({ "name": name }).toArray()
+                //Promise
                 .then(result => {
-                    console.log(result[0].pass)
-                    //console.log(result.pass, pass)
+                    //Check if pass is correct
                     if (result[0].pass == oldPass) {
                         console.log("Correct credentials")
                         updateUserPass(result[0].name, newPass);
+                        //Send respons to browser
                         res.redirect('/')
                     }
+                    //Pass is incorrect
                     else {
                         console.log("Incorrect password or username")
+                        //Send respons to browser
                         res.redirect('/')
                     }
                 })
                 .catch(error => console.error(error))
         });
-
+        //Delete user
         app.post('/delete', (req, res) => {
             let name = req.body.name;
             let pass = req.body.pass;
-            let users = db.collection('Users').find({ "name": name }).toArray()
+            userCollection.find({ "name": name }).toArray()
 
                 .then(result => {
-                    console.log(result[0].pass)
-                    //console.log(result.pass, pass)
+                    //Check if pass is correct
                     if (result[0].pass == pass) {
                         console.log("Correct credentials")
                         deleteUser(name);
+                        //Send respons to browser
                         res.redirect('/')
                     }
+                    //Pass is incorrect
                     else {
                         console.log("Incorrect password or username")
+                        //Send respons to browser
                         res.redirect('/')
                     }
                 })
                 .catch(error => console.error(error))
         });
-
+        //Update user pass after checking password
         app.put(updateUserPass = (name, newPass) => {
-            let passChange = db.collection('Users').updateOne({ "name": name }, { $set: { pass: newPass } })
+            userCollection.updateOne({ "name": name }, { $set: { pass: newPass } })
             .then(result => {
                 console.log("Password changed")
             })
             .catch(error => console.error(error));
         });
-
+        //Delete user after checking password
         app.delete(deleteUser = (name) => {
-            let deleteUser = db.collection('Users').deleteOne({ "name": name })
+            db.collection('Users').deleteOne({ "name": name })
             .then(result => {
                 console.log("User deleted")
             })
